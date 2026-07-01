@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>B787 Systems — Type Rating Quiz</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  /* ============================================================
+     ANSWER KEY  —  EDIT HERE
+     ------------------------------------------------------------
+     These are BEST-EFFORT answers, NOT verified against the FCOM.
+     Confirm each one, then change the letter if needed.
+     Format:  question number : "A" | "B" | "C" | "D"
+     (This block lives in the <script> tag below, near the top.)
+     ============================================================ */
+
+  :root{
+    --bg:#0d1418;
+    --panel:#151e24;
+    --panel-2:#1a252c;
+    --line:#243139;
+    --line-soft:#1d2830;
+    --ink:#e7eef3;
+    --ink-dim:#8ba0ad;
+    --ink-faint:#5f7481;
+    --amber:#e6a20d;
+    --amber-soft:#3a2e10;
+    --green:#31d178;
+    --green-soft:#0f2c1e;
+    --red:# f2554d;
+    --red:#f2554d;
+    --red-soft:#33161a;
+  }
+
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0;
+    background:
+      radial-gradient(1200px 600px at 50% -200px, #16232b 0%, rgba(22,35,43,0) 70%),
+      var(--bg);
+    color:var(--ink);
+    font-family:"Inter",system-ui,sans-serif;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+    padding-bottom:80px;
+  }
+
+  .wrap{max-width:820px;margin:0 auto;padding:0 18px}
+
+  /* annunciator strip */
+  .strip{height:4px;width:100%;
+    background:linear-gradient(90deg,var(--green) 0 33%,var(--amber) 33% 66%,var(--red) 66% 100%);
+    opacity:.85}
+
+  /* header */
+  header{padding:34px 0 22px}
+  .eyebrow{
+    font-family:"IBM Plex Mono",monospace;
+    font-size:11px;letter-spacing:.22em;text-transform:uppercase;
+    color:var(--ink-faint);margin:0 0 14px}
+  h1{
+    font-family:"Barlow Semi Condensed",sans-serif;
+    font-weight:700;font-size:clamp(30px,7vw,46px);line-height:1.02;
+    letter-spacing:.01em;margin:0}
+  h1 .model{color:var(--amber)}
+  .sub{color:var(--ink-dim);font-size:15px;margin:10px 0 0}
+
+  /* EICAS-style status readout */
+  .status{
+    margin-top:22px;
+    border:1px solid var(--line);
+    background:linear-gradient(180deg,var(--panel-2),var(--panel));
+    border-radius:12px;
+    display:grid;grid-template-columns:1fr 1fr 1fr;
+    overflow:hidden}
+  .cell{padding:14px 16px;border-right:1px solid var(--line-soft)}
+  .cell:last-child{border-right:0}
+  .cell .lbl{font-family:"IBM Plex Mono",monospace;font-size:10px;
+    letter-spacing:.18em;text-transform:uppercase;color:var(--ink-faint)}
+  .cell .val{font-family:"IBM Plex Mono",monospace;font-weight:600;
+    font-size:26px;margin-top:4px;color:var(--ink);line-height:1;
+    font-variant-numeric:tabular-nums}
+  #scoreVal.good{color:var(--green)}
+  #scoreVal.warn{color:var(--amber)}
+  #scoreVal.bad{color:var(--red)}
+
+  .bar{height:6px;background:var(--line-soft);border-radius:99px;
+    margin-top:14px;overflow:hidden}
+  .bar > i{display:block;height:100%;width:0;
+    background:linear-gradient(90deg,var(--amber),var(--green));
+    transition:width .35s ease}
+
+  .controls{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap}
+  .btn{
+    font-family:"Barlow Semi Condensed",sans-serif;font-weight:600;
+    font-size:14px;letter-spacing:.04em;text-transform:uppercase;
+    color:var(--ink);background:var(--panel-2);
+    border:1px solid var(--line);border-radius:8px;
+    padding:9px 15px;cursor:pointer;transition:border-color .15s,background .15s}
+  .btn:hover{border-color:var(--amber);background:#20303a}
+  .btn:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+
+  /* verification banner */
+  .notice{
+    margin-top:20px;border:1px solid var(--amber);
+    background:var(--amber-soft);border-radius:10px;
+    padding:13px 15px;display:flex;gap:12px;align-items:flex-start}
+  .notice .dot{flex:0 0 auto;margin-top:5px;width:9px;height:9px;border-radius:99px;
+    background:var(--amber);box-shadow:0 0 10px var(--amber)}
+  .notice p{margin:0;font-size:13.5px;color:#f0dcae}
+  .notice b{color:#ffe6ad}
+  .notice button{margin-left:auto;flex:0 0 auto;background:none;border:0;
+    color:#f0dcae;font-family:"IBM Plex Mono",monospace;font-size:11px;
+    letter-spacing:.12em;cursor:pointer;padding:2px 4px}
+  .notice button:hover{color:#fff}
+
+  /* question card */
+  .q{
+    margin-top:16px;border:1px solid var(--line);
+    background:var(--panel);border-radius:14px;
+    padding:20px 20px 16px}
+  .q.answered{border-color:#2c3a43}
+  .qhead{display:flex;gap:14px;align-items:baseline}
+  .qnum{font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:13px;
+    color:var(--amber);border:1px solid var(--line);border-radius:6px;
+    padding:3px 8px;flex:0 0 auto;letter-spacing:.05em}
+  .qtext{font-family:"Barlow Semi Condensed",sans-serif;font-weight:600;
+    font-size:19px;line-height:1.25;color:var(--ink);margin:0}
+
+  .opts{list-style:none;margin:16px 0 0;padding:0;display:grid;gap:9px}
+  .opt{
+    display:flex;gap:12px;align-items:flex-start;width:100%;text-align:left;
+    background:var(--panel-2);border:1px solid var(--line);
+    border-radius:9px;padding:12px 14px;cursor:pointer;
+    color:var(--ink);font-family:"Inter",sans-serif;font-size:15px;
+    transition:border-color .12s,background .12s}
+  .opt:hover:not(:disabled){border-color:#3a5563;background:#20303a}
+  .opt:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+  .opt:disabled{cursor:default}
+  .opt .k{font-family:"IBM Plex Mono",monospace;font-weight:600;
+    color:var(--ink-dim);flex:0 0 auto;width:18px}
+
+  .opt.correct{border-color:var(--green);background:var(--green-soft)}
+  .opt.correct .k{color:var(--green)}
+  .opt.wrong{border-color:var(--red);background:var(--red-soft)}
+  .opt.wrong .k{color:var(--red)}
+
+  /* verdict line */
+  .verdict{display:none;margin-top:14px;align-items:center;gap:10px;
+    font-family:"IBM Plex Mono",monospace;font-size:12px;letter-spacing:.06em}
+  .q.answered .verdict{display:flex}
+  .verdict .tag{padding:3px 9px;border-radius:6px;font-weight:600;
+    text-transform:uppercase;letter-spacing:.1em}
+  .verdict .tag.ok{background:var(--green-soft);color:var(--green);border:1px solid var(--green)}
+  .verdict .tag.no{background:var(--red-soft);color:var(--red);border:1px solid var(--red)}
+  .verdict .verify{color:var(--ink-faint);border:1px dashed var(--line);
+    padding:3px 8px;border-radius:6px}
+
+  /* results */
+  .results{display:none;margin-top:26px;border:1px solid var(--line);
+    border-radius:14px;background:linear-gradient(180deg,var(--panel-2),var(--panel));
+    padding:22px}
+  .results.show{display:block}
+  .results h2{font-family:"Barlow Semi Condensed",sans-serif;font-weight:700;
+    font-size:24px;margin:0 0 6px}
+  .results p{margin:0;color:var(--ink-dim);font-size:14px}
+  .results .big{font-family:"IBM Plex Mono",monospace;font-weight:600;
+    font-size:44px;margin:12px 0 4px;font-variant-numeric:tabular-nums}
+
+  footer{margin-top:34px;color:var(--ink-faint);font-size:12px;
+    font-family:"IBM Plex Mono",monospace;letter-spacing:.03em;line-height:1.7}
+
+  @media (max-width:560px){
+    .status{grid-template-columns:1fr 1fr}
+    .cell:nth-child(3){grid-column:1/-1;border-right:0;border-top:1px solid var(--line-soft)}
+  }
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="strip"></div>
+<div class="wrap">
+
+  <header>
+    <p class="eyebrow">Air India Training Academy · Systems Revision</p>
+    <h1>Boeing <span class="model">787</span><br>Systems Quiz</h1>
+    <p class="sub">30 questions. Pick an answer and it's marked immediately — green if correct, red if not, with the right option always revealed.</p>
+
+    <div class="status" aria-live="polite">
+      <div class="cell"><div class="lbl">Answered</div><div class="val"><span id="ansVal">0</span>/30</div></div>
+      <div class="cell"><div class="lbl">Correct</div><div class="val" id="corrVal">0</div></div>
+      <div class="cell"><div class="lbl">Score</div><div class="val" id="scoreVal">—</div></div>
+    </div>
+    <div class="bar"><i id="barFill"></i></div>
+
+    <div class="controls">
+      <button class="btn" id="shuffleBtn">Shuffle</button>
+      <button class="btn" id="resetBtn">Reset</button>
+    </div>
+
+    <div class="notice" id="notice">
+      <span class="dot"></span>
+      <p><b>Official answer key loaded.</b> These are the answers from the Air India question paper. If you ever spot one that looks off against the FCOM, correct it in the <b>ANSWERS</b> block at the top of the file.</p>
+      <button id="dismissNotice" aria-label="Dismiss notice">DISMISS</button>
+    </div>
+  </header>
+
+  <main id="quiz"></main>
+
+  <div class="results" id="results">
+    <h2>Set complete</h2>
+    <div class="big" id="finalScore">—</div>
+    <p id="finalLine"></p>
+  </div>
+
+  <footer id="foot"></footer>
+</div>
+
+<script>
+/* ============================================================
+   ANSWER KEY — EDIT THESE LETTERS TO CORRECT
+   Best-effort only. Verify against the FCOM before trusting.
+   ============================================================ */
+const ANSWERS = {
+  1:"A",  2:"B",  3:"D",  4:"B",  5:"C",
+  6:"B",  7:"D",  8:"B",  9:"B", 10:"C",
+ 11:"B", 12:"B", 13:"B", 14:"C", 15:"B",
+ 16:"C", 17:"A", 18:"C", 19:"C", 20:"C",
+ 21:"C", 22:"C", 23:"C", 24:"D", 25:"C",
+ 26:"C", 27:"C", 28:"B", 29:"B", 30:"C"
+};
+
+/* ---- Questions ---- */
+const QUESTIONS = [
+ {n:1, q:"What is indicated when the TRIM AIR FAULT light illuminates?",
+  o:{A:"Valve commanded open",B:"Valve failed closed",C:"Valve failed open",D:"Valve failed – open or closed"}},
+ {n:2, q:"Forward equipment cooling automatically enters override mode when:",
+  o:{A:"Cabin temperature rises",B:"Smoke is detected in the forward equipment cooling system",C:"Pack fails",D:"Either (B) or (C)"}},
+ {n:3, q:"Default cruise altitude used if FMC (in AUTO) data unavailable is:",
+  o:{A:"35,000 ft",B:"39,000 ft",C:"41,000 ft",D:"43,000 ft"}},
+ {n:4, q:"The Alternate Ventilation System operates when:",
+  o:{A:"One pack fails",B:"Both packs fail",C:"Only PACK L EICAS advisory message is displayed",D:"PACK MODE R EICAS advisory message is displayed"}},
+ {n:5, q:"Above 34,000 ft, resetting an inoperative pack may:",
+  o:{A:"Temporarily increase the CAC flow schedule of the operating pack",B:"Prevent reset of the operative pack",C:"Cause operating pack shutdown",D:"Both (B) & (C)"}},
+ {n:6, q:"What does an illuminated DRIVE light indicate with engine running?",
+  o:{A:"Normal generator operation",B:"Generator drive malfunction",C:"The generator control breaker is open",D:"The APU generator control breaker is open"}},
+ {n:7, q:"Can a generator drive be reconnected by the flight crew once disconnected?",
+  o:{A:"Yes, irrespective of whether the generator drive was automatically or manually disconnected",B:"Yes, only if the generator drive is automatically disconnected",C:"Yes, only if the generator drive is manually disconnected",D:"No"}},
+ {n:8, q:"If the APU is not available?",
+  o:{A:"One 90kVA rated forward external power source is required for engine start",B:"Two 90kVA rated forward external power sources are required for engine start",C:"Engine start time while external power is being used is the same as when APU is available",D:"While external power is being used for engine start, only the right engine can be started first"}},
+ {n:9, q:"What is the primary power source for flight control electronics?",
+  o:{A:"Main battery",B:"Permanent Magnet Generators (PMG)",C:"APU generator",D:"Permanent Magnet Alternators (PMA)"}},
+ {n:10, q:"After a power failure, the main battery supplies power to:",
+  o:{A:"Cabin lighting",B:"First Officer's flight instruments",C:"Captain's flight instruments",D:"IFE System"}},
+ {n:11, q:"What replaces fuel temperature when fuel jettison is ARMED?",
+  o:{A:"Fuel used",B:"Fuel to remain",C:"Total fuel uploaded",D:"Fuel flow indications"}},
+ {n:12, q:"Which fuel pump operates automatically to supply fuel to the APU with no AC power?",
+  o:{A:"Right main tank DC pump",B:"Left main tank DC pump",C:"Right main tank pump",D:"Override pump"}},
+ {n:13, q:"FUEL DISAGREE message means:",
+  o:{A:"A fuel pump failure",B:"Totalizer and FMC calculated fuel quantity disagree",C:"Fuel quantity is low",D:"Engine fuel flow is abnormally high"}},
+ {n:14, q:"After jettison completion, minimum fuel remaining in each main tank is:",
+  o:{A:"1500 kg",B:"3000 kg",C:"3900 kg",D:"5000 kg"}},
+ {n:15, q:"The Nitrogen Generation System (NGS):",
+  o:{A:"Generates nitrogen enriched air to displace fuel vapours in main fuel tanks only",B:"Generates nitrogen enriched air to displace fuel vapours in all fuel tanks",C:"Is operative only during flight",D:"Both (B) & (C)"}},
+ {n:16, q:"When the PRIMARY FLIGHT COMPUTERS DISC light is illuminated, what mode is active?",
+  o:{A:"Normal mode",B:"Secondary mode",C:"Direct mode",D:"Alternate mode of flaps & slats"}},
+ {n:17, q:"Which mode allows autopilot operation?",
+  o:{A:"Normal",B:"Secondary",C:"Direct",D:"Alternate"}},
+ {n:18, q:"What triggers automatic reversion to secondary mode?",
+  o:{A:"Pilot selection",B:"Flight attendant input",C:"Insufficient inertial or air data",D:"Autopilot fault"}},
+ {n:19, q:"Alternate flap extension limit is:",
+  o:{A:"Flaps 30",B:"Flaps 25",C:"Flaps 20",D:"Flaps 15"}},
+ {n:20, q:"Stabilizer green band is validated using:",
+  o:{A:"IRS data",B:"FMC only",C:"Nose gear pressure transducers",D:"Static ports"}},
+ {n:21, q:"The RAT PRESS light illuminates when hydraulic pressure exceeds:",
+  o:{A:"2000 psi",B:"2500 psi",C:"3000 psi",D:"5000 psi"}},
+ {n:22, q:"The RAT provides hydraulic power to which system?",
+  o:{A:"Left",B:"Right",C:"Centre",D:"All hydraulic systems"}},
+ {n:23, q:"LOAD SHED indication appears next to:",
+  o:{A:"Primary pump",B:"Isolation valve",C:"Demand pump",D:"Reservoir"}},
+ {n:24, q:"Centre system powers which of the following?",
+  o:{A:"Nose gear steering",B:"Wing spoilers",C:"Flight controls",D:"All of the above"}},
+ {n:25, q:"When in AUTO, left/right demand pumps run:",
+  o:{A:"Continuously",B:"Only on ground",C:"During system low pressure",D:"Never"}},
+ {n:26, q:"The rudder pedal disconnect switch is used during:",
+  o:{A:"Taxi",B:"Landing",C:"Freedom of motion check",D:"Rejected takeoff"}},
+ {n:27, q:"What system powers the brakes?",
+  o:{A:"Hydraulic",B:"Pneumatic",C:"Electric",D:"Mechanical"}},
+ {n:28, q:"Early doors function opens main gear doors:",
+  o:{A:"Before rotation",B:"After lift-off",C:"After lever UP",D:"During taxi"}},
+ {n:29, q:"During alternate extension, gear doors:",
+  o:{A:"Close normally",B:"Remain open",C:"Close after a time delay",D:"Close after a time delay and will not cause the GEAR DOOR EICAS message to be displayed"}},
+ {n:30, q:"Parking brake clamping force requires:",
+  o:{A:"Hydraulic pressure",B:"Electric power",C:"No active power",D:"RAT"}}
+];
+
+/* ---- State + render ---- */
+const TOTAL = QUESTIONS.length;
+let order = QUESTIONS.map((_,i)=>i);
+let attempts = {};        // qn -> chosen letter
+const quizEl = document.getElementById('quiz');
+
+function render(){
+  quizEl.innerHTML = '';
+  order.forEach(idx=>{
+    const item = QUESTIONS[idx];
+    const card = document.createElement('section');
+    card.className = 'q';
+    card.dataset.qn = item.n;
+
+    const head = document.createElement('div');
+    head.className = 'qhead';
+    head.innerHTML = `<span class="qnum">Q${String(item.n).padStart(2,'0')}</span><p class="qtext"></p>`;
+    head.querySelector('.qtext').textContent = item.q;
+    card.appendChild(head);
+
+    const ul = document.createElement('ul');
+    ul.className = 'opts';
+    ['A','B','C','D'].forEach(letter=>{
+      if(!item.o[letter]) return;
+      const li = document.createElement('li');
+      const b = document.createElement('button');
+      b.className = 'opt';
+      b.type = 'button';
+      b.dataset.letter = letter;
+      b.innerHTML = `<span class="k">${letter}</span><span class="txt"></span>`;
+      b.querySelector('.txt').textContent = item.o[letter];
+      b.addEventListener('click',()=>choose(item.n, letter, card));
+      li.appendChild(b);
+      ul.appendChild(li);
+    });
+    card.appendChild(ul);
+
+    const v = document.createElement('div');
+    v.className = 'verdict';
+    v.innerHTML = `<span class="tag"></span><span class="verify">verify vs FCOM</span>`;
+    card.appendChild(v);
+
+    quizEl.appendChild(card);
+    if(attempts[item.n]) lockCard(card, item.n, attempts[item.n]);
+  });
+  updateStatus();
+}
+
+function choose(qn, letter, card){
+  if(attempts[qn]) return;         // one attempt per question
+  attempts[qn] = letter;
+  lockCard(card, qn, letter);
+  updateStatus();
+}
+
+function lockCard(card, qn, chosen){
+  const correct = ANSWERS[qn];
+  card.classList.add('answered');
+  card.querySelectorAll('.opt').forEach(b=>{
+    b.disabled = true;
+    const L = b.dataset.letter;
+    if(L === correct) b.classList.add('correct');
+    else if(L === chosen) b.classList.add('wrong');
+  });
+  const tag = card.querySelector('.verdict .tag');
+  if(chosen === correct){ tag.textContent = 'Correct'; tag.classList.add('ok'); }
+  else { tag.textContent = 'Answer: ' + correct; tag.classList.add('no'); }
+}
+
+function updateStatus(){
+  const answered = Object.keys(attempts).length;
+  let correct = 0;
+  for(const qn in attempts){ if(attempts[qn] === ANSWERS[qn]) correct++; }
+
+  document.getElementById('ansVal').textContent = answered;
+  document.getElementById('corrVal').textContent = correct;
+
+  const scoreEl = document.getElementById('scoreVal');
+  if(answered === 0){ scoreEl.textContent = '—'; scoreEl.className='val'; }
+  else{
+    const pct = Math.round(correct/answered*100);
+    scoreEl.textContent = pct + '%';
+    scoreEl.className = 'val ' + (pct>=80?'good':pct>=60?'warn':'bad');
+  }
+  document.getElementById('barFill').style.width = (answered/TOTAL*100) + '%';
+
+  const res = document.getElementById('results');
+  if(answered === TOTAL){
+    const pct = Math.round(correct/TOTAL*100);
+    document.getElementById('finalScore').textContent = correct + '/' + TOTAL + '  ·  ' + pct + '%';
+    document.getElementById('finalLine').textContent =
+      pct>=80 ? 'Strong. Review the misses and move on.'
+      : pct>=60 ? 'Solid base. Tighten the weak systems.'
+      : 'Worth another pass through the systems notes.';
+    res.classList.add('show');
+  } else {
+    res.classList.remove('show');
+  }
+}
+
+function reset(){
+  attempts = {};
+  document.getElementById('results').classList.remove('show');
+  render();
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function shuffle(){
+  for(let i=order.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [order[i],order[j]] = [order[j],order[i]];
+  }
+  reset();
+}
+
+document.getElementById('resetBtn').addEventListener('click', reset);
+document.getElementById('shuffleBtn').addEventListener('click', shuffle);
+document.getElementById('dismissNotice').addEventListener('click', ()=>{
+  document.getElementById('notice').style.display = 'none';
+});
+
+const now = new Date();
+document.getElementById('foot').textContent =
+  'B787 systems revision · ' + TOTAL + ' items · single-file · offline-ready · answers editable in the ANSWERS block';
+
+render();
+</script>
+</body>
+</html>
